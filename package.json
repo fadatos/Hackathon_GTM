@@ -16,6 +16,8 @@
     "test:slack-intro": "tsx scripts/test-slack-intro.ts",
     "test:meet-webhook": "tsx scripts/test-meet-webhook.ts",
     "update:slack-manifest": "tsx scripts/update-slack-manifest.ts",
+    "simulate:ae-debrief": "tsx scripts/simulate-ae-debrief-output.ts",
+    "announce:commands": "tsx scripts/announce-commands.ts",
     "smoke-test": "tsx scripts/smoke-test.ts",
     "build": "tsc -p tsconfig.json"
   },

@@ -13,12 +13,18 @@ export type MeetInsightsPayload = {
 
 export type LaunchMeetInput = {
   meet_url: string;
-  brief: string;
-  interviewee_name: string;
+  prompt: string;
+  /** @deprecated alias — mapped to prompt */
+  brief?: string;
+  interviewee_name?: string;
   interviewee_role?: string;
 };
 
-const GRADIUM_BRIEF_MAX = 4096;
+const PROMPT_MAX = 4096;
+
+function resolvePrompt(input: LaunchMeetInput): string {
+  return (input.prompt ?? input.brief ?? "").trim();
+}
 
 export async function launchMeetInterview(input: LaunchMeetInput): Promise<{
   ok: boolean;
@@ -26,51 +32,44 @@ export async function launchMeetInterview(input: LaunchMeetInput): Promise<{
   gradium_response?: unknown;
   dry_run?: boolean;
 }> {
-  const { meet_url, brief, interviewee_name, interviewee_role } = input;
+  const { meet_url } = input;
+  const prompt = resolvePrompt(input);
 
   if (!meet_url?.trim()) return { ok: false, error: "meet_url manquant" };
-  if (!brief?.trim()) return { ok: false, error: "brief manquant" };
-  if (brief.length > GRADIUM_BRIEF_MAX) {
+  if (!prompt) return { ok: false, error: "prompt manquant" };
+  if (prompt.length > PROMPT_MAX) {
     return {
       ok: false,
-      error: `brief trop long (${brief.length} > ${GRADIUM_BRIEF_MAX} caractères)`,
+      error: `prompt trop long (${prompt.length} > ${PROMPT_MAX} caractères)`,
     };
   }
-  if (!interviewee_name?.trim()) return { ok: false, error: "interviewee_name manquant" };
 
   const apiUrl = process.env.GRADIUM_API_URL;
-  const apiKey = process.env.GRADIUM_API_KEY;
 
-  if (!apiUrl || !apiKey) {
+  if (!apiUrl) {
     console.log("[launch_meet_interview] dry-run", {
       meet_url,
-      interviewee_name,
-      interviewee_role,
-      brief_len: brief.length,
+      prompt_len: prompt.length,
     });
     return {
       ok: true,
       dry_run: true,
       gradium_response: {
-        message: "GRADIUM_API_URL/KEY non configurés — simulation OK",
+        message: "GRADIUM_API_URL non configuré — simulation OK",
         meet_url,
-        interviewee_name,
       },
     };
   }
 
+  const apiKey = process.env.GRADIUM_API_KEY;
+
   const res = await fetch(apiUrl, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      meet_url,
-      brief,
-      interviewee_name,
-      interviewee_role: interviewee_role ?? "AE",
-    }),
+    body: JSON.stringify({ meet_url, prompt }),
   });
 
   const text = await res.text();
@@ -82,7 +81,7 @@ export async function launchMeetInterview(input: LaunchMeetInput): Promise<{
   }
 
   if (!res.ok) {
-    return { ok: false, error: `Gradium ${res.status}: ${text}`, gradium_response: body };
+    return { ok: false, error: `TACL ${res.status}: ${text}`, gradium_response: body };
   }
 
   return { ok: true, gradium_response: body };
@@ -134,8 +133,8 @@ export async function executeCustomTool(
     if (name === "launch_meet_interview") {
       const result = await launchMeetInterview({
         meet_url: input.meet_url as string,
-        brief: input.brief as string,
-        interviewee_name: input.interviewee_name as string,
+        prompt: (input.prompt ?? input.brief) as string,
+        interviewee_name: input.interviewee_name as string | undefined,
         interviewee_role: input.interviewee_role as string | undefined,
       });
       return {
@@ -143,7 +142,7 @@ export async function executeCustomTool(
         error: result.error,
         dry_run: result.dry_run,
         gradium_response: result.gradium_response,
-        message: result.ok ? "Agent Gradium lancé sur le Meet" : undefined,
+        message: result.ok ? "Agent vocal lancé sur le Meet (TACL)" : undefined,
       };
     }
 

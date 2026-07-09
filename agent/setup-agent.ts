@@ -20,20 +20,22 @@ const LAUNCH_MEET_TOOL = {
   type: "custom",
   name: "launch_meet_interview",
   description:
-    "Lance l'agent vocal Gradium dans un Google Meet / Teams / Zoom. " +
-    "Le brief (≤4096 caractères) guide l'interview. Appeler APRÈS génération du brief et booking du créneau.",
+    "Lance l'agent vocal TACL dans un Google Meet / Teams / Zoom. " +
+    "Envoie uniquement meet_url + prompt (≤4096 car.) au webhook. " +
+    "Le meet_url doit être fourni par l'utilisateur dans Slack — ne jamais inventer.",
   input_schema: {
     type: "object",
     properties: {
-      meet_url: { type: "string", description: "URL complète du meeting" },
-      brief: { type: "string", description: "Brief Gradium, max 4096 caractères" },
-      interviewee_name: { type: "string", description: "Prénom Nom de l'interviewé" },
-      interviewee_role: {
+      meet_url: {
         type: "string",
-        description: "HoS | AE | autre rôle",
+        description: "URL publique du meeting (collée par l'utilisateur dans Slack)",
+      },
+      prompt: {
+        type: "string",
+        description: "Prompt vocal pour l'agent, max 4096 caractères",
       },
     },
-    required: ["meet_url", "brief", "interviewee_name"],
+    required: ["meet_url", "prompt"],
   },
 };
 
@@ -77,7 +79,6 @@ function buildMcpServers(): Array<{ type: "url"; name: string; url: string }> {
     ["notion", process.env.NOTION_MCP_URL],
     ["hubspot", process.env.HUBSPOT_MCP_URL],
     ["slack_internal", process.env.SLACK_MCP_URL],
-    ["google_workspace", process.env.GOOGLE_WORKSPACE_MCP_URL],
   ];
   for (const [name, url] of entries) {
     if (url?.trim()) servers.push({ type: "url", name, url: url.trim() });

@@ -70,15 +70,17 @@ Dans Slack `#gtm` :
 
 **Important** : sans `dev:bridge` actif, `/sam` apparaît dans Slack mais ne répond pas (Socket Mode).
 
-### Onboarding (Phase 1)
+### Onboarding V1 — `/sam-onboard`
 
-1. `/sam onboard` — découverte entreprise (web + MCP)
-2. `/sam book-hos` — premier call Head of Sales (obligatoire)
-3. `/sam book-ae` — calls AE ensuite
-4. `/sam launch-meet <url>` — agent vocal Gradium dans le Meet
-5. Webhook `POST /webhooks/meet` — debrief transcript → Memory Store + synthèse Slack
+1. **A1** — Découverte entreprise (web + MCP Notion/HubSpot)
+2. **A2** — Digest Slack + **demande de coller un lien Meet**
+3. L'utilisateur colle son URL → **`/sam-launch-meet <url>`** ou message avec le lien
+4. **A4** — `prompt` ≤4096 car. + `launch_meet_interview` → TACL (`{ meet_url, prompt }`)
+5. **A5** — Confirmation Slack (*agent dans 30 secondes*)
 
-Voir [`agent/sam-system.md`](agent/sam-system.md) (prompt master unique).
+Pas de Google Calendar / Gmail — le lien Meet est **toujours fourni par l'humain**.
+
+Voir [`agent/sam-system.md`](agent/sam-system.md).
 
 ## Variables d’environnement
 
@@ -92,7 +94,8 @@ Voir [`agent/sam-system.md`](agent/sam-system.md) (prompt master unique).
 | `MEMORY_STORE_ID` | Rempli par `setup:agent` |
 | `COMPANY_NAME` / `COMPANY_DOMAIN` | Injectés dans le system prompt |
 | `HOS_EMAIL` | Email Head of Sales pour booking |
-| `GRADIUM_API_URL` / `GRADIUM_API_KEY` | Lancement agent vocal Meet |
+| `GRADIUM_API_URL` | Webhook TACL voice-interview (`meet_url` + `prompt` uniquement) |
+| `GRADIUM_API_KEY` | Optionnel — Bearer token TACL |
 | `UPDATE_AGENT=1` | Rafraîchir le system prompt sur agent existant |
 | `SLACK_BOT_TOKEN` | `xoxb-...` |
 | `SLACK_APP_TOKEN` | `xapp-...` (scope `connections:write`) |

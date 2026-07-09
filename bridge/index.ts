@@ -3,6 +3,7 @@ import { App } from "@slack/bolt";
 import { createHttpApp } from "./http-server.js";
 import { runAgentTurn } from "./session-client.js";
 import { helpText, registerSamCommands } from "./sam-commands.js";
+import { registerMeetLinkMessages } from "./meet-messages.js";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -45,6 +46,8 @@ registerSamCommands({
   hosEmail,
   dispatchToAgent,
 });
+
+registerMeetLinkMessages(app, { dispatchToAgent, defaultChannelId });
 
 app.action("launch_sourcing", async ({ ack, body }) => {
   await ack();

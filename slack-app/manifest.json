@@ -32,9 +32,15 @@
         "should_escape": false
       },
       {
+        "command": "/sam-meeting",
+        "description": "Lancer agent vocal (sans onboarding)",
+        "usage_hint": "https://meet.google.com/...",
+        "should_escape": false
+      },
+      {
         "command": "/sam-book-ae",
-        "description": "Booker un call AE",
-        "usage_hint": "@person",
+        "description": "Interview AE + agent vocal",
+        "usage_hint": "@person https://meet.google.com/...",
         "should_escape": false
       },
       {
@@ -64,11 +70,14 @@
   },
   "oauth_config": {
     "scopes": {
-      "bot": ["chat:write", "commands", "files:write", "app_mentions:read", "channels:join"]
+      "bot": ["chat:write", "commands", "files:write", "app_mentions:read", "channels:join", "channels:history", "groups:history"]
     }
   },
   "settings": {
     "socket_mode_enabled": true,
+    "event_subscriptions": {
+      "bot_events": ["message.channels", "message.groups", "message.im", "app_mention"]
+    },
     "interactivity": {
       "is_enabled": true
     },
