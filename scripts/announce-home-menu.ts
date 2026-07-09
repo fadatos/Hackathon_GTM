@@ -6,7 +6,7 @@ import { buildSamHomeMenuBlocks } from "../bridge/sam-home-menu.js";
 
 const slack = new WebClient(process.env.SLACK_BOT_TOKEN!);
 const channel = process.env.SLACK_GTM_CHANNEL_ID!;
-const company = process.env.COMPANY_NAME ?? "Acme SaaS";
+const company = process.env.COMPANY_NAME ?? "Sillage";
 
 await slack.chat.postMessage({
   channel,

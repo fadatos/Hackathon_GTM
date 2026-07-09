@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { formatMeetDebriefMarkdown } from "../agent/memory-client.js";
 
-const companyName = process.env.COMPANY_NAME ?? "Acme SaaS";
+const companyName = process.env.COMPANY_NAME ?? "Sillage";
 const channel = process.env.SLACK_GTM_CHANNEL_ID ?? "C0BG8JFAL5P";
 
 const MOCK_PAYLOAD = {

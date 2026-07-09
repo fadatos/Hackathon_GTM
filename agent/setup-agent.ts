@@ -87,8 +87,8 @@ function buildMcpServers(): Array<{ type: "url"; name: string; url: string }> {
 }
 
 async function readSystemPrompt(): Promise<string> {
-  const companyName = process.env.COMPANY_NAME ?? "Acme SaaS";
-  const companyDomain = process.env.COMPANY_DOMAIN ?? "example.com";
+  const companyName = process.env.COMPANY_NAME ?? "Sillage";
+  const companyDomain = process.env.COMPANY_DOMAIN ?? "getsillage.com";
 
   const raw = await fs.readFile(path.join(AGENT_DIR, "sam-system.md"), "utf-8");
   return raw

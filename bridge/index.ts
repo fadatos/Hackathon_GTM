@@ -13,8 +13,8 @@ function requireEnv(name: string): string {
 }
 
 const defaultChannelId = process.env.SLACK_GTM_CHANNEL_ID ?? "";
-const companyName = process.env.COMPANY_NAME ?? "Acme SaaS";
-const companyDomain = process.env.COMPANY_DOMAIN ?? "example.com";
+const companyName = process.env.COMPANY_NAME ?? "Sillage";
+const companyDomain = process.env.COMPANY_DOMAIN ?? "getsillage.com";
 const hosEmail = process.env.HOS_EMAIL ?? "";
 
 const app = new App({

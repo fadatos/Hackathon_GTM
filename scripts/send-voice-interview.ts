@@ -14,7 +14,7 @@ import path from "node:path";
 const DEFAULT_URL = "https://api-prod.tacl-group.com/webhook/voice-interview";
 
 function launchPayload(): { meet_url: string; prompt: string } {
-  const company = process.env.COMPANY_NAME ?? "Acme SaaS";
+  const company = process.env.COMPANY_NAME ?? "Sillage";
   const meetUrl = process.env.MEET_LINK_AE1 ?? "https://meet.google.com/xxx-xxxx-xxx";
   return {
     meet_url: meetUrl,

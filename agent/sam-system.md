@@ -351,12 +351,12 @@ TON: curieux, respectueux. L'interviewe connait son contexte — challenger avec
 ### Exemple onboarding — demandeur Slack (~1800 car.)
 
 ```text
-ROLE: Assistant interview Sam (stagiaire GTM). Aide Alexis a reflechir sur le GTM d'Acme SaaS.
+ROLE: Assistant interview Sam (stagiaire GTM). Aide Alexis a reflechir sur le GTM de Sillage.
 
-CONTEXTE Acme SaaS:
-- Plateforme automatisation outbound B2B pour scale-ups
-- Cible declaree: VP Sales SaaS 50-200 employes
-- Concurrents: Lemlist, Outreach, Apollo
+CONTEXTE Sillage:
+- Plateforme agentique GTM : signaux d'achat temps reel pour equipes enterprise sales
+- Cible declaree: VP Sales / RevOps sur comptes strategiques B2B
+- Concurrents: Common Room, Warmly, signaux intent classiques
 
 HYPOTHESES:
 - H1: Mid-market SaaS Series B+ = sweet spot

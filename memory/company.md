@@ -1,21 +1,22 @@
-## Ce que je sais sur Acme SaaS
+## Ce que je sais sur Sillage
 
 ### Produit & positionnement
-Plateforme d'automatisation outbound B2B pour équipes commerciales. On aide les scale-ups à industrialiser la prospection.
+Plateforme agentique GTM qui détecte des signaux d'achat en temps réel (hiring, funding, champion moves, engagement concurrent, keywords) et les route dans Slack et le CRM.
 
 ### Clients actuels (hypothèses)
-Scale-ups SaaS Series B+, équipes RevOps en croissance.
+Équipes enterprise sales B2B qui pilotent des comptes stratégiques et veulent agir au bon moment sans ajouter un nouvel outil.
 
 ### 3 segments potentiels
-1. VP Sales — SaaS 50-200 employés
-2. RevOps Manager — Series B+
-3. Founder/CEO — Early stage PMF
+1. VP Sales — comptes mid-market / enterprise
+2. RevOps / Sales Ops — orchestration signaux + CRM
+3. CRO / Head of Revenue — priorisation pipeline
 
 ### Signaux Sillage détectés
-- 12× Hiring Intent (ICP scale-ups SaaS)
-- 3× Champion job change
-- 8× Keyword "sales automation"
+- Hiring intent sur rôles commerciaux clés
+- Champion job change
+- Engagement concurrent / influencer
+- Keywords LinkedIn sur l'automatisation GTM
 
 ### Questions ouvertes pour les AE
-- Quel segment closent le plus vite ?
-- Quelles objections reviennent le plus ?
+- Quels signaux convertissent le mieux en meeting ?
+- Quels comptes disqualifier en priorité ?

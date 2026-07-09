@@ -10,8 +10,8 @@ async function main(): Promise<void> {
   const channel = process.env.SLACK_GTM_CHANNEL_ID;
   const agentId = process.env.AGENT_ID ?? "—";
   const memoryId = process.env.MEMORY_STORE_ID ?? "—";
-  const company = process.env.COMPANY_NAME ?? "Acme SaaS";
-  const domain = process.env.COMPANY_DOMAIN ?? "example.com";
+  const company = process.env.COMPANY_NAME ?? "Sillage";
+  const domain = process.env.COMPANY_DOMAIN ?? "getsillage.com";
 
   if (!token || !channel) throw new Error("SLACK_BOT_TOKEN ou SLACK_GTM_CHANNEL_ID manquant");
 

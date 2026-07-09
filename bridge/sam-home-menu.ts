@@ -289,7 +289,7 @@ async function handleSamPing(
 }
 
 export function registerSamHomeMenu(ctx: SamContext): void {
-  const { app, companyName } = ctx;
+  const { app, companyName, companyDomain } = ctx;
 
   ctx.showHomeMenu = (channel, threadTs) =>
     postSamHomeMenu(app, channel, companyName, threadTs);
