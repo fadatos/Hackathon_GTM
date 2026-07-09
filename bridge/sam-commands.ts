@@ -4,7 +4,10 @@ import type { runAgentTurn } from "./session-client.js";
 import {
   dispatchVocalLaunch,
   extractMeetUrl,
+  isValidDomain,
   meetUsageBlock,
+  normalizeDomain,
+  parseOnboardInput,
   stripMeetUrl,
 } from "./meet-url.js";
 
@@ -19,6 +22,7 @@ export type SamContext = {
   companyName: string;
   companyDomain: string;
   hosEmail: string;
+  showHomeMenu?: (channel: string, threadTs?: string) => Promise<void>;
   dispatchToAgent: (
     userMessage: string,
     channelId: string,
@@ -100,6 +104,10 @@ export async function handleSamSubcommand(
   const reqCtx = requester ? `${requesterContext(requester)} ` : "";
 
   if (sub === "intro" || sub === "") {
+    if (ctx.showHomeMenu) {
+      await ctx.showHomeMenu(channel);
+      return;
+    }
     await dispatchToAgent(
       `${reqCtx}L'utilisateur a tapé /sam intro dans le channel ${channel}. ` +
         `Présente-toi comme Sam, stagiaire GTM jour 1 chez ${companyName}. ` +
@@ -111,13 +119,14 @@ export async function handleSamSubcommand(
   }
 
   if (sub === "onboard") {
-    const domain = rest || companyDomain;
-    const demandeur = requester?.userName ?? "le demandeur";
+    const { domain, meetUrl } = parseOnboardInput(rest, companyDomain);
+    const meetNote = meetUrl
+      ? ` URL Meet fournie : ${meetUrl} — enchaîne A4+A5 après A2.`
+      : " Pas de Meet fourni — après A2, demande le lien via bouton *Google Meet* ou collage dans le thread.";
     await dispatchToAgent(
-      `${reqCtx}L'utilisateur lance /sam-onboard pour le domaine "${domain}" (entreprise ${companyName}). ` +
+      `${reqCtx}L'utilisateur lance l'onboarding pour le domaine "${domain}" (entreprise ${companyName}).${meetNote} ` +
         `Exécute A1+A2 : recherche web+MCP, hypothèses draft, slack_post_blocks digest. ` +
-        `En fin de digest, demande de répondre dans le thread : @sam puis bouton *Google Meet*, ou coller le lien Meet. ` +
-        `Si une URL Meet valide est déjà dans le message utilisateur, enchaîne A4 (prompt ≤4096) + launch_meet_interview + A5 confirmation 30s. ` +
+        `Si URL Meet valide fournie, enchaîne A4 (prompt ≤4096) + launch_meet_interview + A5 confirmation 30s. ` +
         `Sinon : onboarding/status.md → awaiting_meet_url. channel_id="${channel}".`,
       channel
     );

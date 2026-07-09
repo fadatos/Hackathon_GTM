@@ -53,6 +53,7 @@ oauth_config:
       - channels:join
       - channels:history
       - groups:history
+      - im:history
       - views:write
       - users:read
 settings:
@@ -61,6 +62,7 @@ settings:
     bot_events:
       - message.channels
       - message.groups
+      - message.im
       - app_mention
   interactivity:
     is_enabled: true

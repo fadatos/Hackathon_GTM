@@ -40,23 +40,21 @@ async function dispatchToAgent(
   });
 }
 
-registerSamCommands({
+const samCtx = {
   app,
   companyName,
   companyDomain,
   hosEmail,
   dispatchToAgent,
-});
+};
 
-registerSamHomeMenu({
-  app,
-  companyName,
-  companyDomain,
-  hosEmail,
-  dispatchToAgent,
-});
+registerSamHomeMenu(samCtx);
+registerSamCommands(samCtx);
 
-registerMeetLinkMessages(app, { dispatchToAgent, defaultChannelId });
+registerMeetLinkMessages(app, {
+  ...samCtx,
+  defaultChannelId,
+});
 
 app.action("launch_sourcing", async ({ ack, body }) => {
   await ack();

@@ -18,6 +18,57 @@ export function stripMeetUrl(text: string): string {
   return text.replace(MEET_URL_RE, "").replace(/\s+/g, " ").trim();
 }
 
+const DOMAIN_RE = /^(?:domaine:\s*)?([a-z0-9][-a-z0-9.]*\.[a-z]{2,})\s*$/i;
+
+export function normalizeDomain(raw: string): string {
+  return raw
+    .trim()
+    .replace(/^domaine:\s*/i, "")
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/\/.*$/, "")
+    .toLowerCase();
+}
+
+export function isValidDomain(domain: string): boolean {
+  return /^[a-z0-9][-a-z0-9.]*\.[a-z]{2,}$/i.test(domain);
+}
+
+/** Parse domaine + meet optionnel depuis texte libre (modal, thread, slash). */
+export function parseOnboardInput(
+  rest: string,
+  defaultDomain: string
+): { domain: string; meetUrl: string | null } {
+  const meetUrl = extractMeetUrl(rest);
+  let remainder = stripMeetUrl(rest).trim();
+
+  const labelledDomain = remainder.match(/domaine:\s*(\S+)/i);
+  if (labelledDomain?.[1]) {
+    return { domain: normalizeDomain(labelledDomain[1]), meetUrl };
+  }
+
+  const inlineDomain = remainder.match(
+    /([a-z0-9][-a-z0-9.]*\.[a-z]{2,})/i
+  );
+  if (inlineDomain?.[1]) {
+    return { domain: normalizeDomain(inlineDomain[1]), meetUrl };
+  }
+
+  if (remainder && DOMAIN_RE.test(remainder)) {
+    return { domain: normalizeDomain(remainder), meetUrl };
+  }
+
+  return { domain: defaultDomain, meetUrl };
+}
+
+export function extractDomainFromText(text: string): string | null {
+  const labelled = text.match(/domaine:\s*(\S+)/i);
+  if (labelled?.[1]) return normalizeDomain(labelled[1]);
+  const stripped = stripMeetUrl(text);
+  const match = stripped.match(/([a-z0-9][-a-z0-9.]*\.[a-z]{2,})/i);
+  return match?.[1] ? normalizeDomain(match[1]) : null;
+}
+
 export function meetUsageBlock(command: string, extraArgs = ""): string {
   const usage = extraArgs
     ? `\`${command} ${extraArgs} <meet_url>\``

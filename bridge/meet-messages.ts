@@ -1,13 +1,75 @@
 import type { App } from "@slack/bolt";
-import { dispatchVocalLaunch, extractMeetUrl } from "./meet-url.js";
-import type { SamContext } from "./sam-commands.js";
+import {
+  dispatchVocalLaunch,
+  extractMeetUrl,
+  parseOnboardInput,
+} from "./meet-url.js";
+import {
+  handleSamSubcommand,
+  requesterFromUserId,
+  type SamContext,
+} from "./sam-commands.js";
 
-type MessageHandlerDeps = Pick<SamContext, "dispatchToAgent"> & {
+type MessageHandlerDeps = SamContext & {
   defaultChannelId: string;
 };
 
+async function handleStructuredThreadReply(
+  deps: MessageHandlerDeps,
+  opts: {
+    channel: string;
+    text: string;
+    userId: string;
+  }
+): Promise<boolean> {
+  const hasDomainLabel = /domaine:\s*\S+/i.test(opts.text);
+  const hasMeetLabel = /meet:\s*\S+/i.test(opts.text);
+
+  if (!hasDomainLabel && !hasMeetLabel) return false;
+
+  const { app, companyDomain } = deps;
+
+  if (hasDomainLabel) {
+    const { domain, meetUrl } = parseOnboardInput(opts.text, companyDomain);
+    const requester = await requesterFromUserId(app, opts.userId);
+    const rest = meetUrl ? `${domain} ${meetUrl}` : domain;
+    console.log(
+      `[thread] onboard domain=${domain} meet=${meetUrl ?? "none"} user=${opts.userId}`
+    );
+    await handleSamSubcommand(deps, opts.channel, "onboard", rest, requester);
+    return true;
+  }
+
+  if (hasMeetLabel) {
+    const meetUrl = extractMeetUrl(opts.text);
+    if (!meetUrl) return false;
+
+    let userName = opts.userId;
+    try {
+      const info = await app.client.users.info({ user: opts.userId });
+      userName = info.user?.real_name ?? info.user?.name ?? opts.userId;
+    } catch {
+      /* ignore */
+    }
+
+    const reqCtx = `slack_user_id="${opts.userId}" slack_user_name="${userName}" `;
+    console.log(`[thread] meet label url=${meetUrl} user=${opts.userId}`);
+    await deps.dispatchToAgent(
+      dispatchVocalLaunch(
+        reqCtx,
+        opts.channel,
+        meetUrl,
+        "L'utilisateur a fourni un lien Meet (format meet: dans le thread)."
+      ),
+      opts.channel
+    );
+    return true;
+  }
+
+  return false;
+}
+
 async function handleMeetLinkMessage(
-  app: App,
   deps: MessageHandlerDeps,
   opts: {
     channel: string;
@@ -19,8 +81,10 @@ async function handleMeetLinkMessage(
   const meetUrl = extractMeetUrl(opts.text);
   if (!meetUrl) return;
 
-  const { dispatchToAgent, defaultChannelId } = deps;
-  const inGtm = !defaultChannelId || opts.channel === defaultChannelId;
+  // Évite double-trigger si le message est un onboard structuré
+  if (/domaine:\s*\S+/i.test(opts.text)) return;
+
+  const { dispatchToAgent, app } = deps;
 
   let userName = opts.userId;
   try {
@@ -47,15 +111,17 @@ async function handleMeetLinkMessage(
 }
 
 /**
- * Détecte un lien Meet dans :
- * - messages channel/thread (#gtm ou thread)
- * - @sam + lien Meet
+ * Détecte dans les threads :
+ * - `domaine: xxx` (+ optionnel meet)
+ * - `meet: https://...`
+ * - lien Meet nu
  */
 export function registerMeetLinkMessages(
   app: App,
   deps: MessageHandlerDeps
 ): void {
   const { defaultChannelId } = deps;
+  const fullDeps = deps;
 
   app.message(async ({ message }) => {
     if (message.subtype) return;
@@ -68,13 +134,17 @@ export function registerMeetLinkMessages(
     if (!inGtm && !inThread) return;
 
     const userId = "user" in message ? message.user : "unknown";
-    await handleMeetLinkMessage(app, deps, {
+    const text = message.text;
+
+    if (await handleStructuredThreadReply(fullDeps, { channel, text, userId })) {
+      return;
+    }
+
+    await handleMeetLinkMessage(fullDeps, {
       channel,
-      text: message.text,
+      text,
       userId,
       source: inThread ? "thread-reply" : "channel-message",
     });
   });
-
-  // @sam + lien Meet : géré par sam-home-menu.ts (menu boutons ou lancement vocal)
 }
