@@ -30,7 +30,7 @@ Sam est un stagiaire GTM IA : le **cerveau** tourne sur l’API **Anthropic Mana
 
 | Couche | Où | Rôle |
 |--------|-----|------|
-| **Source** | `agent/sam-system.md` | System prompt versionné |
+| **Source** | `agent/sam-system.md` | Prompt master unique (identité + onboarding + Gradium) |
 | **Cerveau** | API Anthropic (`AGENT_ID`, `SESSION_ID`) | Raisonnement + sandbox cloud |
 | **Bridge** | `bridge/index.ts` (local ou Render) | Écoute `/sam`, boucle custom tools |
 
@@ -59,11 +59,26 @@ Dans Slack `#gtm` :
 
 ```
 /sam intro
+/sam onboard [domain]
 /sam status
+/sam book-hos
+/sam book-ae @personne
+/sam prep-interview @personne
+/sam launch-meet https://meet.google.com/xxx-xxxx-xxx
 /sam reset
 ```
 
 **Important** : sans `dev:bridge` actif, `/sam` apparaît dans Slack mais ne répond pas (Socket Mode).
+
+### Onboarding (Phase 1)
+
+1. `/sam onboard` — découverte entreprise (web + MCP)
+2. `/sam book-hos` — premier call Head of Sales (obligatoire)
+3. `/sam book-ae` — calls AE ensuite
+4. `/sam launch-meet <url>` — agent vocal Gradium dans le Meet
+5. Webhook `POST /webhooks/meet` — debrief transcript → Memory Store + synthèse Slack
+
+Voir [`agent/sam-system.md`](agent/sam-system.md) (prompt master unique).
 
 ## Variables d’environnement
 
@@ -74,6 +89,11 @@ Dans Slack `#gtm` :
 | `AGENT_ID` | Rempli par `setup:agent` |
 | `ENVIRONMENT_ID` | Rempli par `setup:agent` |
 | `SESSION_ID` | Rempli par `setup:agent` |
+| `MEMORY_STORE_ID` | Rempli par `setup:agent` |
+| `COMPANY_NAME` / `COMPANY_DOMAIN` | Injectés dans le system prompt |
+| `HOS_EMAIL` | Email Head of Sales pour booking |
+| `GRADIUM_API_URL` / `GRADIUM_API_KEY` | Lancement agent vocal Meet |
+| `UPDATE_AGENT=1` | Rafraîchir le system prompt sur agent existant |
 | `SLACK_BOT_TOKEN` | `xoxb-...` |
 | `SLACK_APP_TOKEN` | `xapp-...` (scope `connections:write`) |
 | `SLACK_SIGNING_SECRET` | App credentials |
