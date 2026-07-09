@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: sam-gtm-bridge
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm run dev:bridge
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: "3000"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-4-5
+      - key: AGENT_ID
+        sync: false
+      - key: ENVIRONMENT_ID
+        sync: false
+      - key: SESSION_ID
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_APP_TOKEN
+        sync: false
+      - key: SLACK_SIGNING_SECRET
+        sync: false
+      - key: SLACK_GTM_CHANNEL_ID
+        sync: false

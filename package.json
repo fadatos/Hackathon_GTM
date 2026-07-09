@@ -1,0 +1,34 @@
+{
+  "name": "sam-gtm-agent",
+  "version": "1.0.0",
+  "description": "Sam — AI GTM intern via Claude Managed Agent + Slack bridge",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx bridge/index.ts",
+    "dev:bridge": "tsx bridge/index.ts",
+    "dev:sillage-mcp": "tsx mcp/sillage/server.ts",
+    "dev:fullenrich-mcp": "tsx mcp/fullenrich/server.ts",
+    "setup:agent": "tsx agent/setup-agent.ts",
+    "setup:skills": "tsx agent/upload-skills.ts",
+    "setup:all": "bash scripts/setup-all.sh",
+    "demo:run": "bash scripts/demo-run.sh",
+    "demo:run:ts": "tsx scripts/demo-run.ts",
+    "test:slack-intro": "tsx scripts/test-slack-intro.ts",
+    "smoke-test": "tsx scripts/smoke-test.ts",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@slack/bolt": "^4.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,26 @@
+display_information:
+  name: Sam GTM Intern
+  description: Stagiaire GTM IA — sourcing sur intent via Claude Managed Agent
+  background_color: "#4A154B"
+features:
+  bot_user:
+    display_name: Sam
+    always_online: true
+  slash_commands:
+    - command: /sam
+      description: Parler à Sam, stagiaire GTM
+      usage_hint: "[intro | status | reset]"
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - commands
+      - files:write
+      - app_mentions:read
+settings:
+  socket_mode_enabled: true
+  interactivity:
+    is_enabled: true
+  org_deploy_enabled: false
+  token_rotation_enabled: false
