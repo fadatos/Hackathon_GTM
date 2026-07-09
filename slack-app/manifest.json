@@ -70,7 +70,7 @@
   },
   "oauth_config": {
     "scopes": {
-      "bot": ["chat:write", "commands", "files:write", "app_mentions:read", "channels:join", "channels:history", "groups:history"]
+      "bot": ["chat:write", "commands", "files:write", "app_mentions:read", "channels:join", "channels:history", "groups:history", "views:write", "users:read"]
     }
   },
   "settings": {

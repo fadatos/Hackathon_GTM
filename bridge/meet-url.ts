@@ -1,10 +1,17 @@
-/** Extrait une URL Meet/Teams/Zoom d'un texte Slack. */
+/** Extrait une URL Meet/Teams/Zoom d'un texte Slack (avec ou sans https://). */
 const MEET_URL_RE =
-  /https?:\/\/(?:meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}|teams\.microsoft\.com\/\S+|(?:[\w.-]+\.)?zoom\.us\/\S+)/i;
+  /(?:https?:\/\/)?(?:meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}|teams\.microsoft\.com\/\S+|(?:[\w.-]+\.)?zoom\.us\/\S+)/i;
+
+export function normalizeMeetUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed.replace(/^\/+/, "")}`;
+}
 
 export function extractMeetUrl(text: string): string | null {
   const match = text.match(MEET_URL_RE);
-  return match?.[0] ?? null;
+  if (!match?.[0]) return null;
+  return normalizeMeetUrl(match[0]);
 }
 
 export function stripMeetUrl(text: string): string {

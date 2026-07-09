@@ -53,6 +53,8 @@ oauth_config:
       - channels:join
       - channels:history
       - groups:history
+      - views:write
+      - users:read
 settings:
   socket_mode_enabled: true
   event_subscriptions:

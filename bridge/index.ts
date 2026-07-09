@@ -4,6 +4,7 @@ import { createHttpApp } from "./http-server.js";
 import { runAgentTurn } from "./session-client.js";
 import { helpText, registerSamCommands } from "./sam-commands.js";
 import { registerMeetLinkMessages } from "./meet-messages.js";
+import { registerSamHomeMenu } from "./sam-home-menu.js";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -40,6 +41,14 @@ async function dispatchToAgent(
 }
 
 registerSamCommands({
+  app,
+  companyName,
+  companyDomain,
+  hosEmail,
+  dispatchToAgent,
+});
+
+registerSamHomeMenu({
   app,
   companyName,
   companyDomain,

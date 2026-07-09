@@ -28,7 +28,8 @@ export type SamContext = {
 
 export function helpText(): string {
   return (
-    "Commandes :\n" +
+    "@sam — menu boutons : Onboarding · Statut · Reset · Google Meet\n" +
+    "Commandes slash (legacy) :\n" +
     "`/sam-onboard [domain]` — digest onboarding + demande lien Meet\n" +
     "`/sam-meeting <meet_url>` — lancer agent vocal (sans onboarding)\n" +
     "`/sam-book-ae @person <meet_url>` — interview AE + agent vocal\n" +
@@ -46,16 +47,19 @@ function logSlash(cmd: string, channel: string, text: string, userId?: string): 
   console.log(`[slash] ${cmd} channel=${channel} user=${userId ?? "?"} text="${text}"`);
 }
 
-async function resolveUserEmail(
+export async function requesterFromUserId(
   app: App,
-  userId: string
-): Promise<string | undefined> {
-  try {
-    const info = await app.client.users.info({ user: userId });
-    return info.user?.profile?.email ?? undefined;
-  } catch {
-    return undefined;
-  }
+  userId: string,
+  userName?: string
+): Promise<SlackRequester> {
+  const info = await app.client.users.info({ user: userId }).catch(() => null);
+  const resolvedName =
+    userName ??
+    info?.user?.real_name ??
+    info?.user?.name ??
+    userId;
+  const userEmail = info?.user?.profile?.email ?? undefined;
+  return { userId, userName: resolvedName, userEmail };
 }
 
 function requesterContext(req: SlackRequester): string {
@@ -112,7 +116,7 @@ export async function handleSamSubcommand(
     await dispatchToAgent(
       `${reqCtx}L'utilisateur lance /sam-onboard pour le domaine "${domain}" (entreprise ${companyName}). ` +
         `Exécute A1+A2 : recherche web+MCP, hypothèses draft, slack_post_blocks digest. ` +
-        `En fin de digest, demande de répondre dans le thread avec \`/sam-meeting <url>\` ou @sam + le lien Meet. ` +
+        `En fin de digest, demande de répondre dans le thread : @sam puis bouton *Google Meet*, ou coller le lien Meet. ` +
         `Si une URL Meet valide est déjà dans le message utilisateur, enchaîne A4 (prompt ≤4096) + launch_meet_interview + A5 confirmation 30s. ` +
         `Sinon : onboarding/status.md → awaiting_meet_url. channel_id="${channel}".`,
       channel
@@ -221,10 +225,7 @@ async function requesterFromCommand(
   app: App,
   cmd: SlashCommand
 ): Promise<SlackRequester> {
-  const userId = cmd.user_id;
-  const userName = cmd.user_name ?? userId;
-  const userEmail = await resolveUserEmail(app, userId);
-  return { userId, userName, userEmail };
+  return requesterFromUserId(app, cmd.user_id, cmd.user_name ?? undefined);
 }
 
 export function registerSamCommands(ctx: SamContext): void {

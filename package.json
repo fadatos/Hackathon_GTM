@@ -9,6 +9,7 @@
     "dev:sillage-mcp": "tsx mcp/sillage/server.ts",
     "dev:fullenrich-mcp": "tsx mcp/fullenrich/server.ts",
     "setup:agent": "tsx agent/setup-agent.ts",
+    "rotate:session": "tsx scripts/rotate-session.ts",
     "setup:skills": "tsx agent/upload-skills.ts",
     "setup:all": "bash scripts/setup-all.sh",
     "demo:run": "bash scripts/demo-run.sh",

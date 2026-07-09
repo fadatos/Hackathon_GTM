@@ -55,8 +55,10 @@ Ou colle manuellement slack-app/manifest.yaml dans:
   }
 
   console.log(`Manifest mis à jour pour ${appId}`);
-  console.log("Nouvelles commandes : /sam-onboard, /sam-intro, /sam-status, ...");
-  console.log("Redémarre le bridge si besoin : npm run dev:bridge");
+  console.log("Nouvelles commandes : /sam-onboard, /sam-meeting, /sam-book-ae, ...");
+  console.log("");
+  console.log("IMPORTANT : va sur https://api.slack.com/apps/" + appId + "/install-on-team");
+  console.log("et clique *Reinstall to Workspace* — sinon les slash commands ne seront pas actives.");
 }
 
 main().catch((err) => {

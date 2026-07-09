@@ -76,15 +76,5 @@ export function registerMeetLinkMessages(
     });
   });
 
-  app.event("app_mention", async ({ event }) => {
-    if (!("text" in event) || !event.text) return;
-    const channel = event.channel;
-    if (!channel) return;
-    await handleMeetLinkMessage(app, deps, {
-      channel,
-      text: event.text,
-      userId: event.user,
-      source: "app_mention",
-    });
-  });
+  // @sam + lien Meet : géré par sam-home-menu.ts (menu boutons ou lancement vocal)
 }
