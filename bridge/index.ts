@@ -2,6 +2,7 @@ import "../env.js";
 import { App } from "@slack/bolt";
 import { createHttpApp } from "./http-server.js";
 import { runAgentTurn } from "./session-client.js";
+import { helpText, registerSamCommands } from "./sam-commands.js";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -37,128 +38,12 @@ async function dispatchToAgent(
   });
 }
 
-function helpText(): string {
-  return (
-    "Commandes :\n" +
-    "`/sam intro` — présentation\n" +
-    "`/sam onboard [domain]` — découverte entreprise\n" +
-    "`/sam status` — état onboarding\n" +
-    "`/sam book-hos` — book call Head of Sales\n" +
-    "`/sam book-ae @person` — book call AE\n" +
-    "`/sam prep-interview @person` — préparer une interview\n" +
-    "`/sam launch-meet <url>` — lancer Gradium sur un Meet\n" +
-    "`/sam reset` — nouvelle session (mémoire conservée)"
-  );
-}
-
-app.command("/sam", async ({ command, ack }) => {
-  await ack();
-  const raw = (command.text ?? "").trim();
-  const channel = command.channel_id;
-  const parts = raw.split(/\s+/);
-  const sub = (parts[0] ?? "").toLowerCase();
-  const rest = parts.slice(1).join(" ").trim();
-
-  try {
-    if (sub === "intro" || sub === "") {
-      await dispatchToAgent(
-        `L'utilisateur a tapé /sam intro dans le channel ${channel}. ` +
-          `Présente-toi comme Sam, stagiaire GTM jour 1 chez ${companyName}. ` +
-          `Résume où tu en es dans l'onboarding (lis onboarding/status.md). ` +
-          `Propose la prochaine étape (souvent /sam onboard ou book HoS). channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "onboard") {
-      const domain = rest || companyDomain;
-      await dispatchToAgent(
-        `L'utilisateur lance l'onboarding (/sam onboard) pour le domaine "${domain}" (entreprise ${companyName}). ` +
-          `Exécute l'Étape A : deep search web + MCP Notion/HubSpot/Slack si disponibles. ` +
-          `Documente dans company/research.md et company/internal.md. ` +
-          `Formule 3 hypothèses ICP préliminaires. Poste la synthèse Slack (blocks). channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "status") {
-      await dispatchToAgent(
-        `L'utilisateur demande le statut onboarding (/sam status) dans ${channel}. ` +
-          `Lis onboarding/status.md et résume : étape, HoS fait ou non, AE calls, hypothèses, prochaine action. channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "book-hos") {
-      await dispatchToAgent(
-        `L'utilisateur demande de booker le Head of Sales (/sam book-hos). ` +
-          `Email HoS si connu: ${hosEmail || "(demander via Slack)"}. ` +
-          `Utilise MCP Google Workspace pour proposer un créneau 30 min. ` +
-          `Puis prépare le brief Gradium et annonce les prochaines étapes. channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "book-ae") {
-      const person = rest || "(non précisé — demander qui)";
-      await dispatchToAgent(
-        `L'utilisateur demande de booker un AE (/sam book-ae) : ${person}. ` +
-          `Vérifie dans onboarding/status.md que le call HoS est fait. Si non, refuse poliment et rappelle la règle HoS d'abord. ` +
-          `Sinon book via Google Workspace MCP et prépare l'interview. channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "prep-interview") {
-      const person = rest || "(non précisé)";
-      await dispatchToAgent(
-        `L'utilisateur demande la prep interview (/sam prep-interview) pour : ${person}. ` +
-          `Exécute l'Étape D : contexte, hypothèses H1-H3, 8-12 questions ouvertes, plan post-call. ` +
-          `slack_post_blocks dans ${channel}. Sauvegarde dans interviews/. channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "launch-meet") {
-      const meetUrl = rest;
-      if (!meetUrl) {
-        await app.client.chat.postMessage({
-          channel,
-          text: "Usage : `/sam launch-meet https://meet.google.com/xxx-xxxx-xxx`",
-        });
-        return;
-      }
-      await dispatchToAgent(
-        `L'utilisateur demande de lancer Gradium (/sam launch-meet) sur : ${meetUrl}. ` +
-          `Génère le brief ≤4096 car. (template gradium-brief), puis appelle launch_meet_interview. ` +
-          `Confirme dans Slack. channel_id="${channel}".`,
-        channel
-      );
-      return;
-    }
-
-    if (sub === "reset") {
-      await dispatchToAgent(
-        `L'utilisateur a demandé /sam reset. Confirme qu'une nouvelle session démarre mais que le Memory Store ` +
-          `(hypothèses, debriefs) est conservé. Résume l'état onboarding actuel. channel_id="${channel}".`,
-        channel,
-        ""
-      );
-      return;
-    }
-
-    await app.client.chat.postMessage({ channel, text: helpText() });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("/sam error:", msg);
-    await app.client.chat.postMessage({ channel, text: `Erreur Sam : ${msg}` });
-  }
+registerSamCommands({
+  app,
+  companyName,
+  companyDomain,
+  hosEmail,
+  dispatchToAgent,
 });
 
 app.action("launch_sourcing", async ({ ack, body }) => {

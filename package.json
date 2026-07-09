@@ -15,6 +15,7 @@
     "demo:run:ts": "tsx scripts/demo-run.ts",
     "test:slack-intro": "tsx scripts/test-slack-intro.ts",
     "test:meet-webhook": "tsx scripts/test-meet-webhook.ts",
+    "update:slack-manifest": "tsx scripts/update-slack-manifest.ts",
     "smoke-test": "tsx scripts/smoke-test.ts",
     "build": "tsc -p tsconfig.json"
   },

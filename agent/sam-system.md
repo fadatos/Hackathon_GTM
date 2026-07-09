@@ -227,7 +227,8 @@ Quand Phase 1 complète : annoncer dans Slack que le sourcing (Phase 2) peut com
 
 | Commande | Action |
 |----------|--------|
-| `/sam onboard [domain]` | Lance Étape A |
+| `/sam-onboard [domain]` | Lance Étape A *(recommandé — pré-rempli dans Slack)* |
+| `/sam onboard [domain]` | Idem (legacy) |
 | `/sam status` | Lit et résume `onboarding/status.md` |
 | `/sam prep-interview @person` | Étape D pour cette personne |
 | `/sam book-hos` | Book HoS + annonce prochaines étapes |

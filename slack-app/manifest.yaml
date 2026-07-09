@@ -7,9 +7,37 @@ features:
     display_name: Sam
     always_online: true
   slash_commands:
+    - command: /sam-onboard
+      description: Lancer l'onboarding GTM (découverte entreprise)
+      usage_hint: "[domain]"
+      should_escape: false
+    - command: /sam-intro
+      description: Présentation de Sam + état onboarding
+      should_escape: false
+    - command: /sam-status
+      description: Statut onboarding en cours
+      should_escape: false
+    - command: /sam-book-hos
+      description: Booker le call Head of Sales
+      should_escape: false
+    - command: /sam-book-ae
+      description: Booker un call AE
+      usage_hint: "@person"
+      should_escape: false
+    - command: /sam-prep-interview
+      description: Préparer une interview HoS/AE
+      usage_hint: "@person"
+      should_escape: false
+    - command: /sam-launch-meet
+      description: Lancer Gradium dans un Meet
+      usage_hint: "https://meet.google.com/..."
+      should_escape: false
+    - command: /sam-reset
+      description: Nouvelle session (mémoire conservée)
+      should_escape: false
     - command: /sam
-      description: Parler à Sam, stagiaire GTM
-      usage_hint: "[intro | status | reset]"
+      description: Parler à Sam (toutes commandes)
+      usage_hint: "onboard | intro | status | book-hos | ..."
       should_escape: false
 oauth_config:
   scopes:
@@ -18,6 +46,7 @@ oauth_config:
       - commands
       - files:write
       - app_mentions:read
+      - channels:join
 settings:
   socket_mode_enabled: true
   interactivity:
