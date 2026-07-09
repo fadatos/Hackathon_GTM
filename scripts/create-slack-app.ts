@@ -6,13 +6,12 @@
  * Usage:
  *   SLACK_CONFIG_TOKEN=xoxe-... tsx scripts/create-slack-app.ts
  */
-import "dotenv/config";
+import "../env.js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import yaml from "yaml";
 
 const ROOT = process.cwd();
-const MANIFEST_PATH = path.join(ROOT, "slack-app", "manifest.yaml");
+const MANIFEST_PATH = path.join(ROOT, "slack-app", "manifest.json");
 const ENV_PATH = path.join(ROOT, ".env");
 
 async function upsertEnv(updates: Record<string, string>): Promise<void> {
@@ -44,8 +43,8 @@ SLACK_CONFIG_TOKEN manquant.
     process.exit(1);
   }
 
-  const yamlText = await fs.readFile(MANIFEST_PATH, "utf-8");
-  const manifest = yaml.parse(yamlText) as Record<string, unknown>;
+  const manifestText = await fs.readFile(MANIFEST_PATH, "utf-8");
+  const manifest = JSON.parse(manifestText) as Record<string, unknown>;
 
   const res = await fetch("https://slack.com/api/apps.manifest.create", {
     method: "POST",
